@@ -1,9 +1,10 @@
 {
-  "name": "Chat Toy App",
+  "name": "chat",
   "version": "0.0.1",
   "description": "Dale's Chat Toy App",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
