@@ -2,3 +2,8 @@ language: node_js
 node_js: '7'
 deploy:
   provider: heroku
+  api_key:
+    secure: WggBQ06l7LmzAMrrzdPXYQX2TfB4BqN9iQ9ah9etmY1CUdcCDv/HXiu56Gp3B5Tx97qM01YuxIGESb85c4e7jgXRDzSt/Wr4/Ab5+2oS74XNqK1OeiiXsNoRVX4/5s/YVn4AnRy/nZn6nk4UZl7ynNG8MV4Xz5F4c4H7rnaZyjYEjhzM7e6ORQn3Bx7Iyh02ngPcDOICYnzIAGwMmVuJOF14geLPkImk7dxf7SKmFmHNHHshiJdQRYABRwgcIugdq8xqRHZ6/9vyuuh8x9RgAX9PwnICliQJ/Q46YP48ez8gp4qmfpwggQ4P8wvm8/S2oT+X2okyII1bHBVVWSSB1GfRqtF2yXD8ut148Ov+/w/yjxx0qEmX0jqxqzE2tuVbcdSM6hz5qBHqf/SOf68iLmZMpt7lH0pu8Ba+FVYMIq3a8X8jC4ZKd7DDHpbYggTLZC/H7L+BE0wqIhXBxfMjY0th4dRESMUpi/wGC4IfeHqCpLPA/DB0UZlX4zSh8zBSWQBuBwEpU4YEJ7Gld3QGezgOAlVmGvYqODZj0wyGxhWrkAklWNHfGLvbsHqikGZjLYodAJ9W2qAns0rwoY/anxHtTJ5/OUEt/s7ZwXtntpMFxpX6Vh1WUHsgenwmBwGzs7KBD7+qQusQHfLGQ/U2QNOZRW+MyrGuXKXwAYlctZs=
+  app: dale-chat
+  on:
+    repo: DaleSeo/chat
