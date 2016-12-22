@@ -15,5 +15,5 @@ http://localhost:3000
 
 ## Heroku
 ```
-https://dale-chat.herokuapp.com/
+http://dale-chat.herokuapp.com
 ```
