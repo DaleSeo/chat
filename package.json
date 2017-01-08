@@ -1,7 +1,7 @@
 {
   "name": "chat",
   "version": "0.0.1",
-  "description": "Dale's Chat Toy App",
+  "description": "Dale's Chat",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
