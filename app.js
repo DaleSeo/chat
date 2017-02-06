@@ -5,16 +5,15 @@ var io = require('socket.io')(http);
 
 app.set('port', (process.env.PORT || 5000));
 
-app.use(express.static('public'));
+// static
+app.use(express.static(__dirname + '/public'));
 
+// dynamic
 app.get('/test', function(req, res){
   res.send('Test!');
 });
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
-
+// socket
 io.on('connection', function(socket) {
 	console.log('a user connected');
 	socket.on('chat message', function(msg) {

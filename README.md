@@ -8,6 +8,12 @@
 $ npm start
 ```
 
+## Develop
+
+```
+$ npm run dev
+```
+
 ## Web
 ```
 http://localhost:5000
