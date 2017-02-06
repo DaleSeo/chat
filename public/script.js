@@ -3,6 +3,8 @@ $(function() {
 });
 
 function initialize() {
+  var $messages = $('#messages'); // Messages area
+
   var socket = io();
   $('form').submit(function(){
     socket.emit('chat message', $('#inputMessage').val());
@@ -11,6 +13,12 @@ function initialize() {
   });
 
   socket.on('chat message', function(msg){
-    $('#messages').append($('<li>').text(msg));
+    addMessage('Joe', msg);
   });
+}
+
+function addMessage(user, msg) {
+  let $messages = $('#messages');
+  $messages.append($('<li>').text(`${user}: ${msg}`));
+  $messages[0].scrollTop = $messages[0].scrollHeight;
 }

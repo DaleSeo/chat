@@ -8,6 +8,12 @@
 #btnMessage {
 	width: 18%;
 }
-#messages { height: 300px; list-style-type: none; margin: 0; padding: 0; }
+#messages {
+	height: 300px;
+	list-style-type:
+	none; margin: 0;
+	overflow-y: scroll;
+	padding: 0; 
+}
 #messages li { padding: 5px 10px; }
 #messages li:nth-child(odd) { background: #eee; }
