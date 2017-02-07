@@ -16,9 +16,23 @@ function addKeyEvent() {
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
-      alert($input.val());
+      setUsername();
     }
   });
+}
+
+function setUsername() {
+  const $input = $('#inputUsername');
+  const username = $input.val().trim();
+
+  if (username) {
+    $('#loginPage').fadeOut();
+    $('#chatPage').show();
+    $('#loginPage').off('click');
+
+    alert(username);
+    // socket.emit('add user', username);
+  }
 }
 
 function setSocketIo() {
