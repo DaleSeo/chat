@@ -3,8 +3,33 @@ $(function() {
 });
 
 function initialize() {
-  addKeyEvent();
   setSocketIo();
+  addKeyEvent();
+}
+
+let socket;
+
+function setSocketIo() {
+  socket = io();
+  $('form').submit(function(){
+    socket.emit('chat message', $('#inputMessage').val());
+    $('#inputMessage').val('');
+    return false;
+  });
+
+  socket.on('login', function (data) {
+    appendLog("Welcome to Chat App!");
+    appendParticipantsLog(data);
+  });
+
+  socket.on('user joined', function (data) {
+    appendLog(data.username + ' joined');
+    appendParticipantsLog(data);
+  });
+
+  socket.on('chat message', function(msg){
+    addMessage('Joe', msg);
+  });
 }
 
 function addKeyEvent() {
@@ -30,22 +55,24 @@ function setUsername() {
     $('#chatPage').show();
     $('#loginPage').off('click');
 
-    alert(username);
-    // socket.emit('add user', username);
+    socket.emit('add user', username);
   }
 }
 
-function setSocketIo() {
-  var socket = io();
-  $('form').submit(function(){
-    socket.emit('chat message', $('#inputMessage').val());
-    $('#inputMessage').val('');
-    return false;
-  });
+function appendParticipantsLog(data) {
+  var message = '';
+  if (data.numUsers === 1) {
+    message += "there's 1 participant";
+  } else {
+    message += "there are " + data.numUsers + " participants";
+  }
+  appendLog(message);
+}
 
-  socket.on('chat message', function(msg){
-    addMessage('Joe', msg);
-  });
+function appendLog(msg) {
+  let $messages = $('#messages');
+  $messages.append($('<li class="log">').text(msg));
+  $messages[0].scrollTop = $messages[0].scrollHeight;
 }
 
 function addMessage(user, msg) {

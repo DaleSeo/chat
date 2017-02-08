@@ -13,13 +13,31 @@ app.get('/test', function(req, res){
   res.send('Test!');
 });
 
+let numUsers = 0;
+
 // socket
 io.on('connection', function(socket) {
 	console.log('a user connected');
-	socket.on('chat message', function(msg) {
+
+  socket.on('add user', (username) => {
+    socket.username = username;
+    ++numUsers;
+
+    socket.emit('login', {
+      numUsers: numUsers
+    });
+
+    socket.broadcast.emit('user joined', {
+      username: username,
+      numUsers: numUsers
+    });
+  });
+
+  socket.on('chat message', function(msg) {
 		console.log('message: ' + msg);
 		io.emit('chat message', msg);
 	});
+
 	socket.on('disconnect', function() {
     console.log('user disconnected');
   });
