@@ -1,15 +1,41 @@
+const TYPING_TIMER_LENGTH = 400; // ms
+
+let socket;
+let username;
+let typing = false;
+
 $(function() {
   initialize();
 });
 
 function initialize() {
+  const $input = $('#inputMessage');
+  $input.on('input', function() {
+    monitorTyping();
+  });
+
   setSocketIo();
   addKeyEvent();
   addSubmitEvent();
 }
 
-let socket;
-let username;
+function monitorTyping () {
+  if (!typing) {
+    typing = true;
+    socket.emit('typing');
+  }
+
+  lastTypingTime = new Date().getTime();
+
+  setTimeout(function () {
+    var typingTimer = new Date().getTime();
+    var timeDiff = typingTimer - lastTypingTime;
+    if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
+      socket.emit('stop typing');
+      typing = false;
+    }
+  }, TYPING_TIMER_LENGTH);
+}
 
 function setSocketIo() {
   socket = io();
@@ -24,6 +50,15 @@ function setSocketIo() {
 
   socket.on('chat message', function(data){
     addYourMessage(data.username, data.message);
+  });
+
+  socket.on('typing', function(data) {
+    showTyping(data.username);
+  });
+
+  socket.on('stop typing', function(data) {
+    console.log('user:', data.username);
+    hideTyping(data.username);
   });
 }
 
@@ -84,4 +119,22 @@ function addYourMessage(user, msg) {
   let $messages = $('#messages');
   $messages.append($('<li>').html(`<span class="label label-default">${user}</span> ${msg}`));
   $messages[0].scrollTop = $messages[0].scrollHeight;
+}
+
+function showTyping(user) {
+  let $messages = $('#messages');
+  $messages.append($('<li class="log">').html(`${user} is typing...`).data('user', user));
+  $messages[0].scrollTop = $messages[0].scrollHeight;
+}
+
+function hideTyping(user) {
+  getTypingMessages(user).fadeOut(function () {
+    $(this).remove();
+  });
+}
+
+function getTypingMessages(user) {
+  return $('.log').filter(function (i) {
+    return $(this).data('user') === user;
+  });
 }

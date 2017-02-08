@@ -43,6 +43,18 @@ io.on('connection', function(socket) {
     });
 	});
 
+  socket.on('typing', function () {
+    socket.broadcast.emit('typing', {
+      username: socket.username
+    });
+  });
+
+  socket.on('stop typing', function () {
+    socket.broadcast.emit('stop typing', {
+      username: socket.username
+    });
+  });
+
 	socket.on('disconnect', function() {
     console.log('user disconnected');
   });
