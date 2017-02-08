@@ -15,7 +15,7 @@
         <ul id="messages"></ul>
       </div>
 
-      <form action="" class="form-inline">
+      <form id="formChat" class="form-inline">
         <input id="inputMessage" autocomplete="off" class="form-control"/>
         <button id="btnMessage" class="btn btn-primary pull-right">Send</button>
       </form>
@@ -23,8 +23,10 @@
     <div id="loginPage" class="container">
       <div class="row">
         <div class="col-md-4 col-md-offset-4">
-          <label for="inputUsername">Nickname</label>
-          <input id="inputUsername" class="form-control input-lg" type="text" maxlength="20" />
+          <form id="formLogin">
+            <label for="inputUsername">Nickname</label>
+            <input id="inputUsername" class="form-control input-lg" type="text" maxlength="20" />
+          </form>
         </div>
       </div>
     </div>

@@ -5,30 +5,25 @@ $(function() {
 function initialize() {
   setSocketIo();
   addKeyEvent();
+  addSubmitEvent();
 }
 
 let socket;
+let username;
 
 function setSocketIo() {
   socket = io();
-  $('form').submit(function(){
-    socket.emit('chat message', $('#inputMessage').val());
-    $('#inputMessage').val('');
-    return false;
-  });
 
   socket.on('login', function (data) {
-    appendLog("Welcome to Chat App!");
-    appendParticipantsLog(data);
+    appendLog(`Welcome, ${data.username}! (${data.numUsers})`);
   });
 
   socket.on('user joined', function (data) {
-    appendLog(data.username + ' joined');
-    appendParticipantsLog(data);
+    appendLog(`${data.username} joined. (${data.numUsers})`);
   });
 
-  socket.on('chat message', function(msg){
-    addMessage('Joe', msg);
+  socket.on('chat message', function(data){
+    addYourMessage(data.username, data.message);
   });
 }
 
@@ -39,14 +34,22 @@ function addKeyEvent() {
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
       $input.focus();
     }
-    // When the client hits ENTER on their keyboard
-    if (event.which === 13) {
-      setUsername();
-    }
   });
 }
 
-function setUsername() {
+function addSubmitEvent() {
+  $('#formChat').submit(() => {
+    chat();
+    return false;
+  });
+
+  $('#formLogin').submit(() => {
+    login();
+    return false;
+  });
+}
+
+function login() {
   const $input = $('#inputUsername');
   const username = $input.val().trim();
 
@@ -59,14 +62,10 @@ function setUsername() {
   }
 }
 
-function appendParticipantsLog(data) {
-  var message = '';
-  if (data.numUsers === 1) {
-    message += "there's 1 participant";
-  } else {
-    message += "there are " + data.numUsers + " participants";
-  }
-  appendLog(message);
+function chat() {
+  addMyMessage($('#inputUsername').val(), $('#inputMessage').val());
+  socket.emit('chat message', $('#inputMessage').val());
+  $('#inputMessage').val('');
 }
 
 function appendLog(msg) {
@@ -75,8 +74,14 @@ function appendLog(msg) {
   $messages[0].scrollTop = $messages[0].scrollHeight;
 }
 
-function addMessage(user, msg) {
+function addMyMessage(user, msg) {
   let $messages = $('#messages');
-  $messages.append($('<li>').text(`${user}: ${msg}`));
+  $messages.append($('<li>').html(`<span class="label label-success">${user}</span> ${msg}`));
+  $messages[0].scrollTop = $messages[0].scrollHeight;
+}
+
+function addYourMessage(user, msg) {
+  let $messages = $('#messages');
+  $messages.append($('<li>').html(`<span class="label label-default">${user}</span> ${msg}`));
   $messages[0].scrollTop = $messages[0].scrollHeight;
 }

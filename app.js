@@ -20,22 +20,27 @@ io.on('connection', function(socket) {
 	console.log('a user connected');
 
   socket.on('add user', (username) => {
+    console.log(username, ' has logged in');
+
     socket.username = username;
     ++numUsers;
 
-    socket.emit('login', {
-      numUsers: numUsers
-    });
-
-    socket.broadcast.emit('user joined', {
+    let data = {
       username: username,
       numUsers: numUsers
-    });
+    };
+
+    socket.emit('login', data);
+
+    socket.broadcast.emit('user joined', data);
   });
 
   socket.on('chat message', function(msg) {
 		console.log('message: ' + msg);
-		io.emit('chat message', msg);
+		socket.broadcast.emit('chat message', {
+      username: socket.username,
+      message: msg
+    });
 	});
 
 	socket.on('disconnect', function() {
