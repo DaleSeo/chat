@@ -36,7 +36,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('chat message', function(msg) {
-		console.log('message: ' + msg);
+		console.log(`message: ${msg} from ${socket.username}`);
 		socket.broadcast.emit('chat message', {
       username: socket.username,
       message: msg
@@ -57,6 +57,11 @@ io.on('connection', function(socket) {
 
 	socket.on('disconnect', function() {
     console.log('user disconnected');
+    --numUsers;
+    socket.broadcast.emit('user left', {
+      username: socket.username,
+      numUsers: numUsers
+    });
   });
 });
 
