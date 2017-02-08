@@ -13,13 +13,48 @@ app.get('/test', function(req, res){
   res.send('Test!');
 });
 
+let numUsers = 0;
+
 // socket
 io.on('connection', function(socket) {
 	console.log('a user connected');
-	socket.on('chat message', function(msg) {
+
+  socket.on('add user', (username) => {
+    console.log(username, ' has logged in');
+
+    socket.username = username;
+    ++numUsers;
+
+    let data = {
+      username: username,
+      numUsers: numUsers
+    };
+
+    socket.emit('login', data);
+
+    socket.broadcast.emit('user joined', data);
+  });
+
+  socket.on('chat message', function(msg) {
 		console.log('message: ' + msg);
-		io.emit('chat message', msg);
+		socket.broadcast.emit('chat message', {
+      username: socket.username,
+      message: msg
+    });
 	});
+
+  socket.on('typing', function () {
+    socket.broadcast.emit('typing', {
+      username: socket.username
+    });
+  });
+
+  socket.on('stop typing', function () {
+    socket.broadcast.emit('stop typing', {
+      username: socket.username
+    });
+  });
+
 	socket.on('disconnect', function() {
     console.log('user disconnected');
   });
