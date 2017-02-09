@@ -25,7 +25,7 @@ function monitorTyping () {
     socket.emit('typing');
   }
 
-  lastTypingTime = new Date().getTime();
+  let lastTypingTime = new Date().getTime();
 
   setTimeout(function () {
     var typingTimer = new Date().getTime();
@@ -48,6 +48,10 @@ function setSocketIo() {
     appendLog(`${data.username} joined. (${data.numUsers})`);
   });
 
+  socket.on('user left', function (data) {
+    appendLog(`${data.username} left. (${data.numUsers})`);
+  });
+
   socket.on('chat message', function(data){
     addYourMessage(data.username, data.message);
   });
@@ -57,9 +61,18 @@ function setSocketIo() {
   });
 
   socket.on('stop typing', function(data) {
-    console.log('user:', data.username);
     hideTyping(data.username);
   });
+
+  socket.on('disconnect', function () {
+    appendLog('You have been disconnected.');
+  });
+
+  socket.on('reconnect', function () {
+    appendLog('You have been reconnected.');
+    login();
+  });
+
 }
 
 function addKeyEvent() {
