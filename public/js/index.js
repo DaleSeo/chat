@@ -25,7 +25,7 @@ function monitorTyping () {
     socket.emit('typing');
   }
 
-  lastTypingTime = new Date().getTime();
+  let lastTypingTime = new Date().getTime();
 
   setTimeout(function () {
     var typingTimer = new Date().getTime();
