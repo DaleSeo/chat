@@ -1,5 +1,5 @@
+import Util from '.util';
 import Messenger from './messenger';
-
 
 const TYPING_TIMER_LENGTH = 400; // ms
 
@@ -9,12 +9,13 @@ let typing = false;
 
 $(function() {
   messenger = new Messenger($('#messages'));
-  addEventListeners();
-  setSocketIo();
+
+  addEventListenersToDocument();
+  addEventListenersToSocket();
 });
 
-function setSocketIo() {
-  socket = io();
+function addEventListenersToSocket() {
+  socket = require('socket.io-client')();
 
   socket.on('login', function (data) {
     messenger.appendLog(`Welcome, ${data.username}! (${data.numUsers})`);
@@ -50,7 +51,7 @@ function setSocketIo() {
   });
 }
 
-function addEventListeners() {
+function addEventListenersToDocument() {
   const $input = $('#inputMessage');
   $input.on('input', function() {
     monitorTyping();
