@@ -1,4 +1,5 @@
-import Util from '.util';
+import $ from 'jquery';
+import Util from './util';
 import Messenger from './messenger';
 
 const TYPING_TIMER_LENGTH = 400; // ms

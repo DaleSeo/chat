@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "build": "webpack",
+    "watch": "webpack -w",
     "dev": "DEBUG=socket.io:* nodemon app.js"
   },
   "repository": {
