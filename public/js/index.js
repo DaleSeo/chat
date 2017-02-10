@@ -76,8 +76,8 @@ function monitorTyping () {
   let lastTypingTime = new Date().getTime();
 
   setTimeout(function () {
-    var typingTimer = new Date().getTime();
-    var timeDiff = typingTimer - lastTypingTime;
+    let typingTimer = new Date().getTime();
+    let timeDiff = typingTimer - lastTypingTime;
     if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
       socket.emit('stop typing');
       typing = false;

@@ -67,14 +67,87 @@
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */,
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Messenger = function () {
+  function Messenger($messages) {
+    _classCallCheck(this, Messenger);
+
+    console.log('### Messenger object is created. ###');
+    this.$messages = $messages;
+  }
+
+  _createClass(Messenger, [{
+    key: 'appendLog',
+    value: function appendLog(msg) {
+      this.$messages.append($('<li class="log">').text(msg));
+      this._scrollDown();
+    }
+  }, {
+    key: 'appendMyMessage',
+    value: function appendMyMessage(user, msg) {
+      this.$messages.append($('<li>').html('<span class="label label-success">' + user + '</span> ' + msg));
+      this._scrollDown();
+    }
+  }, {
+    key: 'appendYourMessage',
+    value: function appendYourMessage(user, msg) {
+      this.$messages.append($('<li>').html('<span class="label label-default">' + user + '</span> ' + msg));
+      this._scrollDown();
+    }
+  }, {
+    key: 'appendTyping',
+    value: function appendTyping(user) {
+      this.$messages.append($('<li class="log">').html(user + ' is typing...').data('user', user));
+      this._scrollDown();
+    }
+  }, {
+    key: 'removeTyping',
+    value: function removeTyping(user) {
+      var msgToRemove = this._getTypingMessages(user);
+      msgToRemove.fadeOut(function () {
+        $(msgToRemove).remove();
+      });
+    }
+  }, {
+    key: '_getTypingMessages',
+    value: function _getTypingMessages(user) {
+      return $('.log').filter(function (index, element) {
+        return $(element).data('user') === user;
+      });
+    }
+  }, {
+    key: '_scrollDown',
+    value: function _scrollDown() {
+      this.$messages[0].scrollTop = this.$messages[0].scrollHeight;
+    }
+  }]);
+
+  return Messenger;
+}();
+
+exports.default = Messenger;
+
+/***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _messenger = __webpack_require__(2);
+var _messenger = __webpack_require__(0);
 
 var _messenger2 = _interopRequireDefault(_messenger);
 
@@ -183,83 +256,6 @@ function login() {
     socket.emit('add user', username);
   }
 }
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Messenger = function () {
-  function Messenger($messages) {
-    _classCallCheck(this, Messenger);
-
-    console.log('### Messenger object is created. ###');
-    this.$messages = $messages;
-  }
-
-  _createClass(Messenger, [{
-    key: 'appendLog',
-    value: function appendLog(msg) {
-      this.$messages.append($('<li class="log">').text(msg));
-      this._scrollDown();
-    }
-  }, {
-    key: 'appendMyMessage',
-    value: function appendMyMessage(user, msg) {
-      this.$messages.append($('<li>').html('<span class="label label-success">' + user + '</span> ' + msg));
-      this._scrollDown();
-    }
-  }, {
-    key: 'appendYourMessage',
-    value: function appendYourMessage(user, msg) {
-      this.$messages.append($('<li>').html('<span class="label label-default">' + user + '</span> ' + msg));
-      this._scrollDown();
-    }
-  }, {
-    key: 'appendTyping',
-    value: function appendTyping(user) {
-      this.$messages.append($('<li class="log">').html(user + ' is typing...').data('user', user));
-      this._scrollDown();
-    }
-  }, {
-    key: 'removeTyping',
-    value: function removeTyping(user) {
-      var _this = this;
-
-      this._getTypingMessages(user).fadeOut(function () {
-        $(_this).remove();
-      });
-    }
-  }, {
-    key: '_getTypingMessages',
-    value: function _getTypingMessages(user) {
-      var _this2 = this;
-
-      return $('.log').filter(function (i) {
-        return $(_this2).data('user') === user;
-      });
-    }
-  }, {
-    key: '_scrollDown',
-    value: function _scrollDown() {
-      this.$messages[0].scrollTop = this.$messages[0].scrollHeight;
-    }
-  }]);
-
-  return Messenger;
-}();
-
-exports.default = Messenger;
 
 /***/ })
 /******/ ]);

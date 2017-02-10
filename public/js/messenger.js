@@ -26,14 +26,15 @@ export default class Messenger {
   }
 
   removeTyping(user) {
-    this._getTypingMessages(user).fadeOut(() => {
-      $(this).remove();
+    let msgToRemove = this._getTypingMessages(user);
+    msgToRemove.fadeOut(() => {
+      $(msgToRemove).remove();
     });
   }
 
   _getTypingMessages(user) {
-    return $('.log').filter((i) => {
-      return $(this).data('user') === user;
+    return $('.log').filter((index, element) => {
+      return $(element).data('user') === user;
     });
   }
 
