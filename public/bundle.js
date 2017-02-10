@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,25 +73,150 @@
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Messenger = function () {
+  function Messenger($messages) {
+    _classCallCheck(this, Messenger);
+
+    console.log('### Messenger object is created. ###');
+    this.$messages = $messages;
+  }
+
+  _createClass(Messenger, [{
+    key: 'appendLog',
+    value: function appendLog(msg) {
+      this.$messages.append($('<li class="log">').text(msg));
+      this._scrollDown();
+    }
+  }, {
+    key: 'appendMyMessage',
+    value: function appendMyMessage(user, msg) {
+      this.$messages.append($('<li>').html('<span class="label label-success">' + user + '</span> ' + msg));
+      this._scrollDown();
+    }
+  }, {
+    key: 'appendYourMessage',
+    value: function appendYourMessage(user, msg) {
+      this.$messages.append($('<li>').html('<span class="label label-default">' + user + '</span> ' + msg));
+      this._scrollDown();
+    }
+  }, {
+    key: 'appendTyping',
+    value: function appendTyping(user) {
+      this.$messages.append($('<li class="log">').html(user + ' is typing...').data('user', user));
+      this._scrollDown();
+    }
+  }, {
+    key: 'removeTyping',
+    value: function removeTyping(user) {
+      var msgToRemove = this._getTypingMessages(user);
+      msgToRemove.fadeOut(function () {
+        $(msgToRemove).remove();
+      });
+    }
+  }, {
+    key: '_getTypingMessages',
+    value: function _getTypingMessages(user) {
+      return $('.log').filter(function (index, element) {
+        return $(element).data('user') === user;
+      });
+    }
+  }, {
+    key: '_scrollDown',
+    value: function _scrollDown() {
+      this.$messages[0].scrollTop = this.$messages[0].scrollHeight;
+    }
+  }]);
+
+  return Messenger;
+}();
+
+exports.default = Messenger;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _messenger = __webpack_require__(0);
+
+var _messenger2 = _interopRequireDefault(_messenger);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var TYPING_TIMER_LENGTH = 400; // ms
 
+var messenger = void 0;
 var socket = void 0;
-var username = void 0;
 var typing = false;
 
 $(function () {
-  initialize();
+  messenger = new _messenger2.default($('#messages'));
+  addEventListeners();
+  setSocketIo();
 });
 
-function initialize() {
+function setSocketIo() {
+  socket = io();
+
+  socket.on('login', function (data) {
+    messenger.appendLog('Welcome, ' + data.username + '! (' + data.numUsers + ')');
+  });
+
+  socket.on('user joined', function (data) {
+    messenger.appendLog(data.username + ' joined. (' + data.numUsers + ')');
+  });
+
+  socket.on('user left', function (data) {
+    messenger.appendLog(data.username + ' left. (' + data.numUsers + ')');
+  });
+
+  socket.on('chat message', function (data) {
+    messenger.appendYourMessage(data.username, data.message);
+  });
+
+  socket.on('typing', function (data) {
+    messenger.appendTyping(data.username);
+  });
+
+  socket.on('stop typing', function (data) {
+    messenger.removeTyping(data.username);
+  });
+
+  socket.on('disconnect', function () {
+    messenger.appendLog('You have been disconnected.');
+  });
+
+  socket.on('reconnect', function () {
+    messenger.appendLog('You have been reconnected.');
+    login();
+  });
+}
+
+function addEventListeners() {
   var $input = $('#inputMessage');
   $input.on('input', function () {
     monitorTyping();
   });
 
-  setSocketIo();
-  addKeyEvent();
-  addSubmitEvent();
+  $('#formChat').submit(function () {
+    chat();
+    return false;
+  });
+
+  $('#formLogin').submit(function () {
+    login();
+    return false;
+  });
 }
 
 function monitorTyping() {
@@ -112,63 +237,10 @@ function monitorTyping() {
   }, TYPING_TIMER_LENGTH);
 }
 
-function setSocketIo() {
-  socket = io();
-
-  socket.on('login', function (data) {
-    appendLog('Welcome, ' + data.username + '! (' + data.numUsers + ')');
-  });
-
-  socket.on('user joined', function (data) {
-    appendLog(data.username + ' joined. (' + data.numUsers + ')');
-  });
-
-  socket.on('user left', function (data) {
-    appendLog(data.username + ' left. (' + data.numUsers + ')');
-  });
-
-  socket.on('chat message', function (data) {
-    addYourMessage(data.username, data.message);
-  });
-
-  socket.on('typing', function (data) {
-    showTyping(data.username);
-  });
-
-  socket.on('stop typing', function (data) {
-    hideTyping(data.username);
-  });
-
-  socket.on('disconnect', function () {
-    appendLog('You have been disconnected.');
-  });
-
-  socket.on('reconnect', function () {
-    appendLog('You have been reconnected.');
-    login();
-  });
-}
-
-function addKeyEvent() {
-  var $input = $('#inputUsername');
-  $(window).keydown(function (event) {
-    // Auto-focus the current input when a key is typed
-    if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $input.focus();
-    }
-  });
-}
-
-function addSubmitEvent() {
-  $('#formChat').submit(function () {
-    chat();
-    return false;
-  });
-
-  $('#formLogin').submit(function () {
-    login();
-    return false;
-  });
+function chat() {
+  messenger.appendMyMessage($('#inputUsername').val(), $('#inputMessage').val());
+  socket.emit('chat message', $('#inputMessage').val());
+  $('#inputMessage').val('');
 }
 
 function login() {
@@ -177,53 +249,12 @@ function login() {
 
   if (username) {
     $('#loginPage').fadeOut();
-    $('#chatPage').show();
     $('#loginPage').off('click');
+    $('#chatPage').show();
+    $('#inputMessage').focus();
 
     socket.emit('add user', username);
   }
-}
-
-function chat() {
-  addMyMessage($('#inputUsername').val(), $('#inputMessage').val());
-  socket.emit('chat message', $('#inputMessage').val());
-  $('#inputMessage').val('');
-}
-
-function appendLog(msg) {
-  var $messages = $('#messages');
-  $messages.append($('<li class="log">').text(msg));
-  $messages[0].scrollTop = $messages[0].scrollHeight;
-}
-
-function addMyMessage(user, msg) {
-  var $messages = $('#messages');
-  $messages.append($('<li>').html('<span class="label label-success">' + user + '</span> ' + msg));
-  $messages[0].scrollTop = $messages[0].scrollHeight;
-}
-
-function addYourMessage(user, msg) {
-  var $messages = $('#messages');
-  $messages.append($('<li>').html('<span class="label label-default">' + user + '</span> ' + msg));
-  $messages[0].scrollTop = $messages[0].scrollHeight;
-}
-
-function showTyping(user) {
-  var $messages = $('#messages');
-  $messages.append($('<li class="log">').html(user + ' is typing...').data('user', user));
-  $messages[0].scrollTop = $messages[0].scrollHeight;
-}
-
-function hideTyping(user) {
-  getTypingMessages(user).fadeOut(function () {
-    $(this).remove();
-  });
-}
-
-function getTypingMessages(user) {
-  return $('.log').filter(function (i) {
-    return $(this).data('user') === user;
-  });
 }
 
 /***/ })
