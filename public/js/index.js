@@ -8,6 +8,30 @@ let messenger;
 let socket;
 let typing = false;
 
+function sendMessage() {
+  messenger.appendMyMessage($('#inputUsername').val(), $('#inputMessage').val());
+  socket.emit('send message', $('#inputMessage').val());
+  $('#inputMessage').val('');
+}
+
+function login() {
+  const $input = $('#inputUsername');
+  const username = $input.val().trim();
+
+  if (username) {
+    socket.emit('add user', username, (okay) => {
+      if (okay) {
+        $('#loginPage').fadeOut();
+        $('#loginPage').off('click');
+        $('#chatPage').show();
+        $('#inputMessage').focus();
+      } else {
+        $('#errorUsername').text('That username is already taken!');
+      }
+    });
+  }
+}
+
 $(function() {
   messenger = new Messenger($('#messages'));
 
@@ -18,35 +42,43 @@ $(function() {
 function addEventListenersToSocket() {
   socket = require('socket.io-client')();
 
-  socket.on('login', function (data) {
+  socket.on('login', (data) => {
     messenger.appendLog(`Welcome, ${data.username}! (${data.numUsers})`);
   });
 
-  socket.on('user joined', function (data) {
+  socket.on('user joined', (data) => {
     messenger.appendLog(`${data.username} joined. (${data.numUsers})`);
   });
 
-  socket.on('user left', function (data) {
+  socket.on('user left', (data) => {
     messenger.appendLog(`${data.username} left. (${data.numUsers})`);
   });
 
-  socket.on('chat message', function(data){
+  socket.on('users', (users) => {
+    let html = '';
+    for (let user of users) {
+      html += `<li>${user}</li>`;
+    }
+    $('#users').html(html);
+  });
+
+  socket.on('new message', (data) => {
     messenger.appendYourMessage(data.username, data.message);
   });
 
-  socket.on('typing', function(data) {
+  socket.on('typing', (data) => {
     messenger.appendTyping(data.username);
   });
 
-  socket.on('stop typing', function(data) {
+  socket.on('stop typing', (data) => {
     messenger.removeTyping(data.username);
   });
 
-  socket.on('disconnect', function () {
+  socket.on('disconnect', () => {
     messenger.appendLog('You have been disconnected.');
   });
 
-  socket.on('reconnect', function () {
+  socket.on('reconnect', () => {
     messenger.appendLog('You have been reconnected.');
     login();
   });
@@ -54,18 +86,18 @@ function addEventListenersToSocket() {
 
 function addEventListenersToDocument() {
   const $input = $('#inputMessage');
-  $input.on('input', function() {
+  $input.on('input', (e) => {
     monitorTyping();
   });
 
-  $('#formChat').submit(() => {
-    chat();
-    return false;
+  $('#formChat').submit((e) => {
+    e.preventDefault();
+    sendMessage();
   });
 
-  $('#formLogin').submit(() => {
+  $('#formLogin').submit((e) => {
+    e.preventDefault();
     login();
-    return false;
   });
 }
 
@@ -85,24 +117,4 @@ function monitorTyping () {
       typing = false;
     }
   }, TYPING_TIMER_LENGTH);
-}
-
-function chat() {
-  messenger.appendMyMessage($('#inputUsername').val(), $('#inputMessage').val());
-  socket.emit('chat message', $('#inputMessage').val());
-  $('#inputMessage').val('');
-}
-
-function login() {
-  const $input = $('#inputUsername');
-  const username = $input.val().trim();
-
-  if (username) {
-    $('#loginPage').fadeOut();
-    $('#loginPage').off('click');
-    $('#chatPage').show();
-    $('#inputMessage').focus();
-
-    socket.emit('add user', username);
-  }
 }
