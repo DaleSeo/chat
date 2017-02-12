@@ -1,7 +1,9 @@
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+
+let users = new Set();
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -13,58 +15,63 @@ app.get('/test', function(req, res){
   res.send('Test!');
 });
 
-let numUsers = 0;
-
 // socket
-io.on('connection', function(socket) {
+io.on('connection', (socket) => {
 	console.log('a user connected');
 
-  socket.on('add user', (username) => {
-    console.log(username, ' has logged in');
-
-    socket.username = username;
-    ++numUsers;
-
-    let data = {
-      username: username,
-      numUsers: numUsers
-    };
-
-    socket.emit('login', data);
-
-    socket.broadcast.emit('user joined', data);
+  socket.on('add user', (username, callback) => {
+    if (users.has(username)) {
+      console.log('duplicated user!');
+      callback(false);
+    } else {
+      console.log(username, ' has logged in');
+      callback(true);
+      socket.username = username;
+      users.add(username);
+      io.emit('users', Array.from(users));
+      socket.emit('login', {
+        username: username,
+        numUsers: users.size
+      });
+      socket.broadcast.emit('user joined', {
+        username: username,
+        numUsers: users.size
+      });
+    }
   });
 
-  socket.on('chat message', function(msg) {
+  socket.on('send message', (msg) => {
 		console.log(`message: ${msg} from ${socket.username}`);
-		socket.broadcast.emit('chat message', {
+		socket.broadcast.emit('new message', {
       username: socket.username,
       message: msg
     });
 	});
 
-  socket.on('typing', function () {
+  socket.on('typing', () => {
     socket.broadcast.emit('typing', {
       username: socket.username
     });
   });
 
-  socket.on('stop typing', function () {
+  socket.on('stop typing', () => {
     socket.broadcast.emit('stop typing', {
       username: socket.username
     });
   });
 
-	socket.on('disconnect', function() {
+	socket.on('disconnect', () => {
     console.log('user disconnected');
-    --numUsers;
+    if (!socket.nickname) return;
+    users.delete(socket.username);
+    io.emit('users', Array.from(users));
     socket.broadcast.emit('user left', {
       username: socket.username,
-      numUsers: numUsers
+      numUsers: users.size
     });
   });
 });
 
-http.listen(app.get('port'), function() {
+http.listen(app.get('port'), () => {
   console.log('Node app is running on port', app.get('port'));
 });

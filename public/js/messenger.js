@@ -1,7 +1,8 @@
+import $ from 'jquery';
+
 export default class Messenger {
 
   constructor($messages) {
-    console.log('### Messenger object is created. ###');
     this.$messages = $messages;
   }
 
