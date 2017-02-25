@@ -1,3 +1,6 @@
+const Repository = require('./src/repository');
+const repository = new Repository();
+
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -16,12 +19,10 @@ app.get('/test', function(req, res){
 });
 
 app.get('/loadPastMessages', (req, res) => {
-  let messages = [
-    {username: 'Dale', message: 'Hi!'},
-    {username: 'Kate', message: 'Hey~'},
-    {username: 'Dale', message: 'Welcome :)'}
-  ];
-  res.send(messages);
+  repository.findAll((err, messages) => {
+    if (err) res.send([]);
+    res.send(messages);
+  });
 });
 
 // socket
