@@ -19351,11 +19351,20 @@ function login() {
         (0, _jquery2.default)('#loginPage').off('click');
         (0, _jquery2.default)('#chatPage').show();
         (0, _jquery2.default)('#inputMessage').focus();
+        loadPastMessages();
       } else {
         (0, _jquery2.default)('#errorUsername').text('That username is already taken!');
       }
     });
   }
+}
+
+function loadPastMessages() {
+  _jquery2.default.getJSON('/loadPastMessages').done(function (messages) {
+    messages.forEach(function (msg) {
+      messenger.appendYourMessage(msg.username, msg.message);
+    });
+  });
 }
 
 (0, _jquery2.default)(function () {

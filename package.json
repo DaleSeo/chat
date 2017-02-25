@@ -4,10 +4,10 @@
   "description": "Dale's Chat",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node app",
     "build": "webpack",
     "watch": "webpack -w",
-    "dev": "DEBUG=socket.io:* nodemon app.js"
+    "dev": "DEBUG=socket.io:* nodemon app"
   },
   "repository": {
     "type": "git",

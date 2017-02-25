@@ -15,6 +15,15 @@ app.get('/test', function(req, res){
   res.send('Test!');
 });
 
+app.get('/loadPastMessages', (req, res) => {
+  let messages = [
+    {username: 'Dale', message: 'Hi!'},
+    {username: 'Kate', message: 'Hey~'},
+    {username: 'Dale', message: 'Welcome :)'}
+  ];
+  res.send(messages);
+});
+
 // socket
 io.on('connection', (socket) => {
 	console.log('a user connected');

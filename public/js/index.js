@@ -27,11 +27,21 @@ function login() {
         $('#loginPage').off('click');
         $('#chatPage').show();
         $('#inputMessage').focus();
+        loadPastMessages();
       } else {
         $('#errorUsername').text('That username is already taken!');
       }
     });
   }
+}
+
+function loadPastMessages() {
+  $.getJSON('/loadPastMessages')
+    .done(messages => {
+      messages.forEach(msg => {
+        messenger.appendYourMessage(msg.username, msg.message);
+      });
+    });
 }
 
 $(function() {
