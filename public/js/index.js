@@ -9,7 +9,7 @@ let socket;
 let typing = false;
 
 function sendMessage() {
-  messenger.appendMyMessage($('#inputUsername').val(), $('#inputMessage').val());
+  messenger.appendMessage($('#inputUsername').val(), $('#inputMessage').val());
   socket.emit('send message', $('#inputMessage').val(), (data) => {
     messenger.appendLog(data);
   });
@@ -19,6 +19,7 @@ function sendMessage() {
 function login() {
   const $input = $('#inputUsername');
   const username = $input.val().trim();
+  messenger.setUsername(username);
 
   if (username) {
     socket.emit('add user', username, (okay) => {
@@ -39,7 +40,7 @@ function loadPastMessages() {
   $.getJSON('/loadPastMessages')
     .done(messages => {
       messages.forEach(msg => {
-        messenger.appendYourMessage(msg.username, msg.message);
+        messenger.appendMessage(msg.username, msg.message);
       });
     });
 }
@@ -75,7 +76,7 @@ function addEventListenersToSocket() {
   });
 
   socket.on('new message', (data) => {
-    messenger.appendYourMessage(data.username, data.message);
+    messenger.appendMessage(data.username, data.message);
   });
 
   socket.on('direct message', (data) => {

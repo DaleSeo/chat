@@ -1,5 +1,1 @@
-[
-  {"username": "Dale", "message": "Hi!"},
-  {"username": "Kate", "message": "Hey~"},
-  {"username": "Dale", "message": "Welcome :)"}
-]
+[{"username":"Dale","message":"Hi!"},{"username":"Kate","message":"Hey~"},{"username":"Ben","message":"What's up?"}]

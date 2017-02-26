@@ -6,8 +6,18 @@ export default class Messenger {
     this.$messages = $messages;
   }
 
+  setUsername(username) {
+    this.username = username;
+  }
+
   appendLog(msg) {
     this.$messages.append($('<li class="log">').text(msg));
+    this._scrollDown();
+  }
+
+  appendMessage(user, msg) {
+    let className = this.username && this.username === user ? 'label-success' : 'label-default';
+    this.$messages.append($('<li>').html(`<span class="label ${className}">${user}</span> ${msg}`));
     this._scrollDown();
   }
 

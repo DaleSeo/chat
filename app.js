@@ -70,10 +70,17 @@ io.on('connection', (socket) => {
         callback('Please enter a message to send a direct message.');
       }
     } else {
-      socket.broadcast.emit('new message', {
+      let message = {
         username: socket.username,
         message: msg
+      };
+      repository.insert(message, err => {
+        if (err) {
+          console.log(err);
+          throw err;
+        }
       });
+      socket.broadcast.emit('new message', message);
     }
 	});
 
