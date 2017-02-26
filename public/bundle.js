@@ -14167,6 +14167,12 @@ var Messenger = function () {
       this._scrollDown();
     }
   }, {
+    key: 'appendDirectMessage',
+    value: function appendDirectMessage(user, msg) {
+      this.$messages.append((0, _jquery2.default)('<li>').html('<span class="label label-warning">' + user + '</span> ' + msg));
+      this._scrollDown();
+    }
+  }, {
     key: 'appendTyping',
     value: function appendTyping(user) {
       this.$messages.append((0, _jquery2.default)('<li class="log">').html(user + ' is typing...').data('user', user));
@@ -19328,7 +19334,9 @@ var typing = false;
 
 function sendMessage() {
   messenger.appendMyMessage((0, _jquery2.default)('#inputUsername').val(), (0, _jquery2.default)('#inputMessage').val());
-  socket.emit('send message', (0, _jquery2.default)('#inputMessage').val());
+  socket.emit('send message', (0, _jquery2.default)('#inputMessage').val(), function (data) {
+    messenger.appendLog(data);
+  });
   (0, _jquery2.default)('#inputMessage').val('');
 }
 
@@ -19404,6 +19412,10 @@ function addEventListenersToSocket() {
 
   socket.on('new message', function (data) {
     messenger.appendYourMessage(data.username, data.message);
+  });
+
+  socket.on('direct message', function (data) {
+    messenger.appendDirectMessage(data.username, data.message);
   });
 
   socket.on('typing', function (data) {

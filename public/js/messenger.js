@@ -21,6 +21,11 @@ export default class Messenger {
     this._scrollDown();
   }
 
+  appendDirectMessage(user, msg) {
+    this.$messages.append($('<li>').html(`<span class="label label-warning">${user}</span> ${msg}`));
+    this._scrollDown();
+  }
+
   appendTyping(user) {
     this.$messages.append($('<li class="log">').html(`${user} is typing...`).data('user', user));
     this._scrollDown();

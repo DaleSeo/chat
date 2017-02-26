@@ -10,7 +10,9 @@ let typing = false;
 
 function sendMessage() {
   messenger.appendMyMessage($('#inputUsername').val(), $('#inputMessage').val());
-  socket.emit('send message', $('#inputMessage').val());
+  socket.emit('send message', $('#inputMessage').val(), (data) => {
+    messenger.appendLog(data);
+  });
   $('#inputMessage').val('');
 }
 
@@ -64,6 +66,10 @@ function addEventListenersToSocket() {
 
   socket.on('new message', (data) => {
     messenger.appendYourMessage(data.username, data.message);
+  });
+
+  socket.on('direct message', (data) => {
+    messenger.appendDirectMessage(data.username, data.message);
   });
 
   socket.on('typing', (data) => {
