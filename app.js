@@ -1,3 +1,6 @@
+const Repository = require('./src/repository');
+const repository = new Repository();
+
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -13,6 +16,13 @@ app.use(express.static(__dirname + '/public'));
 // dynamic
 app.get('/test', function(req, res){
   res.send('Test!');
+});
+
+app.get('/loadPastMessages', (req, res) => {
+  repository.findAll((err, messages) => {
+    if (err) res.send([]);
+    res.send(messages);
+  });
 });
 
 // socket
@@ -60,10 +70,17 @@ io.on('connection', (socket) => {
         callback('Please enter a message to send a direct message.');
       }
     } else {
-      socket.broadcast.emit('new message', {
+      let message = {
         username: socket.username,
         message: msg
+      };
+      repository.insert(message, err => {
+        if (err) {
+          console.log(err);
+          throw err;
+        }
       });
+      socket.broadcast.emit('new message', message);
     }
 	});
 

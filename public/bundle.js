@@ -14149,9 +14149,21 @@ var Messenger = function () {
   }
 
   _createClass(Messenger, [{
+    key: 'setUsername',
+    value: function setUsername(username) {
+      this.username = username;
+    }
+  }, {
     key: 'appendLog',
     value: function appendLog(msg) {
       this.$messages.append((0, _jquery2.default)('<li class="log">').text(msg));
+      this._scrollDown();
+    }
+  }, {
+    key: 'appendMessage',
+    value: function appendMessage(user, msg) {
+      var className = this.username && this.username === user ? 'label-success' : 'label-default';
+      this.$messages.append((0, _jquery2.default)('<li>').html('<span class="label ' + className + '">' + user + '</span> ' + msg));
       this._scrollDown();
     }
   }, {
@@ -19333,7 +19345,7 @@ var socket = void 0;
 var typing = false;
 
 function sendMessage() {
-  messenger.appendMyMessage((0, _jquery2.default)('#inputUsername').val(), (0, _jquery2.default)('#inputMessage').val());
+  messenger.appendMessage((0, _jquery2.default)('#inputUsername').val(), (0, _jquery2.default)('#inputMessage').val());
   socket.emit('send message', (0, _jquery2.default)('#inputMessage').val(), function (data) {
     messenger.appendLog(data);
   });
@@ -19343,6 +19355,7 @@ function sendMessage() {
 function login() {
   var $input = (0, _jquery2.default)('#inputUsername');
   var username = $input.val().trim();
+  messenger.setUsername(username);
 
   if (username) {
     socket.emit('add user', username, function (okay) {
@@ -19351,11 +19364,20 @@ function login() {
         (0, _jquery2.default)('#loginPage').off('click');
         (0, _jquery2.default)('#chatPage').show();
         (0, _jquery2.default)('#inputMessage').focus();
+        loadPastMessages();
       } else {
         (0, _jquery2.default)('#errorUsername').text('That username is already taken!');
       }
     });
   }
+}
+
+function loadPastMessages() {
+  _jquery2.default.getJSON('/loadPastMessages').done(function (messages) {
+    messages.forEach(function (msg) {
+      messenger.appendMessage(msg.username, msg.message);
+    });
+  });
 }
 
 (0, _jquery2.default)(function () {
@@ -19411,7 +19433,7 @@ function addEventListenersToSocket() {
   });
 
   socket.on('new message', function (data) {
-    messenger.appendYourMessage(data.username, data.message);
+    messenger.appendMessage(data.username, data.message);
   });
 
   socket.on('direct message', function (data) {
